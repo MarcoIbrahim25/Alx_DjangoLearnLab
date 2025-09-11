@@ -10,7 +10,7 @@ from relationship_app.models import Author, Book, Library, Librarian
 def query_books_by_author(author_name):
     try:
         author = Author.objects.get(name=author_name)
-        books = author.books.all()
+        books = Book.objects.filter(author=author)  # ✅ التعديل هنا
         print(f"Books by {author.name}: {[book.title for book in books]}")
     except Author.DoesNotExist:
         print("Author not found.")
@@ -25,10 +25,11 @@ def query_books_in_library(library_name):
         print("Library not found.")
 
 
+
 def query_librarian_for_library(library_name):
     try:
         library = Library.objects.get(name=library_name)
-        librarian = library.librarian
+        librarian = Librarian.objects.get(library=library)  # ✅ مهم يبان كده
         print(f"Librarian for {library.name}: {librarian.name}")
     except Library.DoesNotExist:
         print("Library not found.")
