@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
@@ -12,7 +12,7 @@ class Book(models.Model):
 def profile_upload_path(instance, filename):
     return f"profile_photos/{instance.id}/{filename}"
 
-class CustomUserManager(DjangoUserManager):
+class CustomUserManager(BaseUserManager):
     def create_user(self, username, email=None, password=None, **extra_fields):
         if not username:
             raise ValueError("The username must be set")
