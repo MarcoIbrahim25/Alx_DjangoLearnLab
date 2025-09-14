@@ -12,9 +12,10 @@ class Book(models.Model):
     publication_year = models.IntegerField(null=True, blank=True)
     class Meta:
         permissions = (
-            ("can_add_book", "Can add book"),
-            ("can_change_book", "Can change book"),
-            ("can_delete_book", "Can delete book"),
+            ("can_view", "Can view book"),
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_delete", "Can delete book"),
         )
     def __str__(self):
         return self.title
