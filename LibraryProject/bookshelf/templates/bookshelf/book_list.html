@@ -1,8 +1,0 @@
-<h1>Books</h1>
-<ul>
-  {% for book in books %}
-    <li>{{ book.title }} - {{ book.author }} ({{ book.publication_year }})</li>
-  {% empty %}
-    <li>No books available.</li>
-  {% endfor %}
-</ul>
