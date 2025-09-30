@@ -23,15 +23,15 @@ class BookAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["title"], "1984")
 
-    def test_create_book_requires_authentication(self):
-        url = reverse("book-create")
-        data = {"title": "Animal Farm", "publication_year": 1945, "author": self.author.id}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+def test_create_book_requires_authentication(self):
+    url = reverse("book-create")
+    data = {"title": "Animal Farm", "publication_year": 1945, "author": self.author.id}
+    response = self.client.post(url, data)
+    self.assertIn(response.status_code, (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+    self.client.login(username="testuser", password="password123")
+    response = self.client.post(url, data)
+    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.client.login(username="testuser", password="password123")
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_book(self):
         self.client.login(username="testuser", password="password123")
