@@ -1,16 +1,19 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from . import views
+from .views import (
+    home, PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
+    register, profile
+)
 
 urlpatterns = [
-    path("", views.home, name="home"),
-    path("posts/", views.PostListView.as_view(), name="posts"),
-    path("posts/new/", views.PostCreateView.as_view(), name="post-create"),
-    path("posts/<int:pk>/", views.PostDetailView.as_view(), name="post-detail"),
-    path("posts/<int:pk>/edit/", views.PostUpdateView.as_view(), name="post-edit"),
-    path("posts/<int:pk>/delete/", views.PostDeleteView.as_view(), name="post-delete"),
+    path("", home, name="home"),
+    path("posts/", PostListView.as_view(), name="posts"),
+    path("post/new/", PostCreateView.as_view(), name="post-new"),
+    path("post/<int:pk>/", PostDetailView.as_view(), name="post-detail"),
+    path("post/<int:pk>/update/", PostUpdateView.as_view(), name="post-update"),
+    path("post/<int:pk>/delete/", PostDeleteView.as_view(), name="post-delete"),
     path("login/", LoginView.as_view(template_name="auth/login.html"), name="login"),
     path("logout/", LogoutView.as_view(template_name="auth/logout.html"), name="logout"),
-    path("register/", views.register, name="register"),
-    path("profile/", views.profile, name="profile"),
+    path("register/", register, name="register"),
+    path("profile/", profile, name="profile"),
 ]
