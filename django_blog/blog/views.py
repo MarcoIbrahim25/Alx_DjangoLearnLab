@@ -8,23 +8,23 @@ from .forms import CustomUserCreationForm, UserUpdateForm, PostForm
 from .models import Post
 
 def home(request):
-    return render(request, "home.html")
+    return render(request, "blog/home.html")
 
 class PostListView(ListView):
     model = Post
-    template_name = "blog/posts/listing.html"
+    template_name = "blog/post_list.html"
     context_object_name = "posts"
     ordering = ["-published_date"]
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = "blog/posts/viewing.html"
+    template_name = "blog/post_details.html"
     context_object_name = "post"
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
-    template_name = "blog/posts/creating.html"
+    template_name = "blog/post_form.html"
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -32,25 +32,24 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
-    template_name = "blog/posts/editing.html"
+    template_name = "blog/post_edit_form.html"
     def test_func(self):
         obj = self.get_object()
         return obj.author == self.request.user
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    template_name = "blog/posts/deleting.html"
+    template_name = "blog/post_confirm_delete.html"
     success_url = reverse_lazy("posts")
     def test_func(self):
         obj = self.get_object()
         return obj.author == self.request.user
 
-
 def post_list(request):
     return redirect("posts")
 
 def login_view_placeholder(request):
-    return render(request, "login.html")
+    return render(request, "blog/login.html")
 
 def register(request):
     if request.method == "POST":
@@ -61,7 +60,7 @@ def register(request):
             return redirect("home")
     else:
         form = CustomUserCreationForm()
-    return render(request, "auth/register.html", {"form": form})
+    return render(request, "blog/register.html", {"form": form})
 
 @login_required
 def profile(request):
@@ -72,4 +71,4 @@ def profile(request):
             return redirect("profile")
     else:
         form = UserUpdateForm(instance=request.user)
-    return render(request, "auth/profile.html", {"form": form})
+    return render(request, "blog/profile.html", {"form": form})
