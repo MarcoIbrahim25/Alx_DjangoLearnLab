@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Post Form{% endblock %}
+{% block content %}
+<h2>{{ view.object|yesno:"Edit Post,Create Post" }}</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<p><a href="{% url 'posts' %}">Cancel</a></p>
+{% endblock %}
