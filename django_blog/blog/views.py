@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
+from django.db.models import Q
 from .forms import CustomUserCreationForm, UserUpdateForm, PostForm, CommentForm
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 
 def home(request):
     return render(request, "blog/home.html")
@@ -26,13 +27,35 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     form_class = PostForm
     template_name = "blog/post_form.html"
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
+        obj = form.save(commit=False)
+        obj.author = self.request.user
+        obj.save()
+        tags_str = form.cleaned_data.get("tags", "")
+        names = [t.strip() for t in tags_str.split(",") if t.strip()]
+        tags = [Tag.objects.get_or_create(name=n)[0] for n in names]
+        if tags:
+            obj.tags.set(tags)
+        else:
+            obj.tags.clear()
+        self.object = obj
+        return redirect("post-detail", pk=obj.pk)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = "blog/post_edit_form.html"
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.save()
+        tags_str = form.cleaned_data.get("tags", "")
+        names = [t.strip() for t in tags_str.split(",") if t.strip()]
+        tags = [Tag.objects.get_or_create(name=n)[0] for n in names]
+        if tags:
+            obj.tags.set(tags)
+        else:
+            obj.tags.clear()
+        self.object = obj
+        return redirect("post-detail", pk=obj.pk)
     def test_func(self):
         return self.get_object().author == self.request.user
 
@@ -48,7 +71,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     form_class = CommentForm
     template_name = "blog/comment_form.html"
     def form_valid(self, form):
-        post = get_object_or_404(Post, pk=self.kwargs["post_id"])
+        post = get_object_or_404(Post, pk=self.kwargs["pk"])
         form.instance.post = post
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -71,6 +94,24 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse("post-detail", kwargs={"pk": self.object.post.pk})
     def test_func(self):
         return self.get_object().author == self.request.user
+
+class TagPostsView(ListView):
+    model = Post
+    template_name = "blog/tag_posts.html"
+    context_object_name = "posts"
+    def get_queryset(self):
+        return Post.objects.filter(tags__name=self.kwargs["tag_name"]).order_by("-published_date").distinct()
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["tag_name"] = self.kwargs["tag_name"]
+        return ctx
+
+def search(request):
+    q = request.GET.get("q", "").strip()
+    posts = Post.objects.all()
+    if q:
+        posts = posts.filter(Q(title__icontains=q) | Q(content__icontains=q) | Q(tags__name__icontains=q)).distinct()
+    return render(request, "blog/search_results.html", {"query": q, "posts": posts})
 
 def register(request):
     if request.method == "POST":

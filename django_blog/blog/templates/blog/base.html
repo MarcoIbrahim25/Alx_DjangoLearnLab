@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Django Blog{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-    {% block extra_head %}{% endblock %}
   </head>
   <body>
     <header>
@@ -14,24 +13,21 @@
         <ul>
           <li><a href="{% url 'home' %}">Home</a></li>
           <li><a href="{% url 'posts' %}">Blog Posts</a></li>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'profile' %}">Profile</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-          {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-            <li><a href="{% url 'register' %}">Register</a></li>
-          {% endif %}
+          <li><a href="{% url 'register' %}">Register</a></li>
+          <li><a href="{% url 'profile' %}">Profile</a></li>
         </ul>
+        <form action="{% url 'search' %}" method="get" style="display: inline">
+          <input type="text" name="q" placeholder="Search" />
+        </form>
       </nav>
     </header>
 
-    <div class="content">
-      {% block content %}{% endblock %}
-    </div>
+    <div class="content">{% block content %}{% endblock %}</div>
 
-    <footer><p>&copy; 2025 Django Blog</p></footer>
+    <footer>
+      <p>&copy; 2025 Django Blog</p>
+    </footer>
 
     <script src="{% static 'js/scripts.js' %}"></script>
-    {% block extra_scripts %}{% endblock %}
   </body>
 </html>
