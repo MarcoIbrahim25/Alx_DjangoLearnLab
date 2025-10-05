@@ -1,18 +1,8 @@
 from django.urls import path
 from .views import (
-    home,
-    PostListView,
-    PostDetailView,
-    PostCreateView,
-    PostUpdateView,
-    PostDeleteView,
-    CommentCreateView,
-    CommentUpdateView,
-    CommentDeleteView,
-    TagPostsView,
-    search,
-    register,
-    profile,
+    home, PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
+    CommentCreateView, CommentUpdateView, CommentDeleteView,
+    TagPostsView, search, register, profile
 )
 
 urlpatterns = [
