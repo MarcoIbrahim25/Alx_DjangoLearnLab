@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
+from taggit.models import Tag
 from .forms import CustomUserCreationForm, UserUpdateForm, PostForm, CommentForm
 from .models import Post, Comment
 
@@ -99,6 +100,19 @@ class TagPostsView(ListView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["tag_name"] = self.kwargs["tag_name"]
+        return ctx
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = "blog/tag_posts.html"
+    context_object_name = "posts"
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs["tag_slug"])
+        return Post.objects.filter(tags__in=[self.tag]).order_by("-published_date").distinct()
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["tag"] = self.tag
+        ctx["tag_name"] = self.tag.name
         return ctx
 
 def register(request):
