@@ -1,14 +1,38 @@
-{% extends "base.html" %}
+{% extends "blog/base.html" %}
 {% block title %}{{ post.title }}{% endblock %}
+
 {% block content %}
 <h2>{{ post.title }}</h2>
 <p>{{ post.content }}</p>
-<p><small>by {{ post.author.username }} • {{ post.published_date }}</small></p>
-{% if user.is_authenticated and user == post.author %}
-<p>
-  <a href="{% url 'post-update' post.pk %}">Edit</a> |
-  <a href="{% url 'post-delete' post.pk %}">Delete</a>
-</p>
+<p><small>By {{ post.author.username }} • {{ post.published_date }}</small></p>
+
+<hr>
+<h3>Comments</h3>
+
+{% for comment in post.comment_set.all %}
+  <div style="margin-bottom: 10px;">
+    <p>{{ comment.content }}</p>
+    <small>by {{ comment.author.username }} • {{ comment.created_at }}</small>
+    {% if user.is_authenticated and user == comment.author %}
+      | <a href="{% url 'comment-edit' comment.pk %}">Edit</a>
+      | <a href="{% url 'comment-delete' comment.pk %}">Delete</a>
+    {% endif %}
+  </div>
+{% empty %}
+  <p>No comments yet.</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+  <h4>Add a Comment</h4>
+  <form method="post" action="{% url 'comment-new' post_id=post.pk %}">
+    {% csrf_token %}
+    <textarea name="content" rows="3" placeholder="Write your comment..." required></textarea><br>
+    <button type="submit">Post Comment</button>
+  </form>
+{% else %}
+  <p><a href="{% url 'login' %}">Login</a> to leave a comment.</p>
 {% endif %}
-<p><a href="{% url 'posts' %}">Back to list</a></p>
+
+<hr>
+<p><a href="{% url 'posts' %}">← Back to all posts</a></p>
 {% endblock %}
