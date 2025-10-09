@@ -2,7 +2,6 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import User as CustomUser
-from .serializers import UserSerializer
 
 
 class FollowUserView(generics.GenericAPIView):
@@ -14,7 +13,7 @@ class FollowUserView(generics.GenericAPIView):
         if target_user == request.user:
             return Response({'detail': 'You cannot follow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.add(target_user)
-        return Response({'detail': f'You are now following {target_user.username}.'}, status=status.HTTP_200_OK)
+        return Response({'detail': f'Now following {target_user.username}.'}, status=status.HTTP_200_OK)
 
 
 class UnfollowUserView(generics.GenericAPIView):
@@ -26,4 +25,4 @@ class UnfollowUserView(generics.GenericAPIView):
         if target_user == request.user:
             return Response({'detail': 'You cannot unfollow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.remove(target_user)
-        return Response({'detail': f'You unfollowed {target_user.username}.'}, status=status.HTTP_200_OK)
+        return Response({'detail': f'Unfollowed {target_user.username}.'}, status=status.HTTP_200_OK)
